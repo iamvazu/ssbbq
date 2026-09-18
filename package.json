@@ -1,0 +1,10 @@
+{
+  "name": "smoke-signal-bbq",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Order taking + kitchen dashboard for the Smoke Signal BBQ stall (BITS Pilani Goa).",
+  "type": "module",
+  "dependencies": {
+    "@upstash/redis": "^1.38.0"
+  }
+}
