@@ -1,6 +1,5 @@
-import { Redis } from '@upstash/redis';
+import { getRedis } from '../lib/redis.js';
 
-const redis = Redis.fromEnv();
 const MENU_KEY = 'menu';
 
 export default async function handler(req, res) {
@@ -10,6 +9,8 @@ export default async function handler(req, res) {
   }
 
   try {
+    const redis = getRedis();
+
     if (req.method === 'PATCH') {
       const existing = await redis.hget(MENU_KEY, id);
       if (!existing) return res.status(404).json({ error: 'Item not found' });
@@ -36,6 +37,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (err) {
     console.error('menu/[id] handler error', err);
-    return res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: err.message || 'Server error' });
   }
 }

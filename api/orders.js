@@ -1,11 +1,12 @@
-import { Redis } from '@upstash/redis';
+import { getRedis } from './lib/redis.js';
 
-const redis = Redis.fromEnv();
 const ORDERS_KEY = 'orders';
 const COUNTER_KEY = 'order:counter';
 
 export default async function handler(req, res) {
   try {
+    const redis = getRedis();
+
     if (req.method === 'GET') {
       const orders = await redis.hgetall(ORDERS_KEY);
       const list = orders ? Object.values(orders) : [];
@@ -52,6 +53,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (err) {
     console.error('orders handler error', err);
-    return res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: err.message || 'Server error' });
   }
 }

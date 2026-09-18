@@ -1,6 +1,5 @@
-import { Redis } from '@upstash/redis';
+import { getRedis } from '../lib/redis.js';
 
-const redis = Redis.fromEnv();
 const ORDERS_KEY = 'orders';
 const VALID_STATUSES = ['placed', 'in_process', 'delivered', 'cancelled'];
 
@@ -11,6 +10,8 @@ export default async function handler(req, res) {
   }
 
   try {
+    const redis = getRedis();
+
     if (req.method === 'PATCH') {
       const existing = await redis.hget(ORDERS_KEY, id);
       if (!existing) return res.status(404).json({ error: 'Order not found' });
@@ -29,6 +30,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (err) {
     console.error('orders/[id] handler error', err);
-    return res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: err.message || 'Server error' });
   }
 }

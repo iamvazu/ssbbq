@@ -611,6 +611,17 @@
     await apiSend('/api/menu/' + id, 'DELETE');
     await refreshMenu();
   }
+  async function onSeedDefaultClick(){
+    showToast('Loading starter menu…');
+    try {
+      await apiSend('/api/menu?seed=true', 'POST', {});
+      await refreshMenu();
+      showToast('Starter menu loaded with 12 items!');
+    } catch(e) {
+      console.error(e);
+      showToast('Could not load menu: ' + (e.message || 'Database error'), true);
+    }
+  }
 
   // ---------------- Routing ----------------
   function route(){
@@ -655,7 +666,14 @@
     var available = menuItems.filter(function(m){ return m.available !== false; });
     var bodyHtml;
     if (menuItems.length === 0) {
-      bodyHtml = emptyState('No items on the menu yet', 'Add items from the Menu tab to start taking orders.', '<a href="#menu" class="btn primary">Go to Menu setup</a>');
+      bodyHtml = emptyState(
+        'No items on the menu yet',
+        'Load the starter Smoke Signal BBQ menu (12 items) or add items manually in Menu setup.',
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;">' +
+          '<button class="btn primary seed-default-btn" type="button">Load Starter Menu (12 items)</button>' +
+          '<a href="#menu" class="btn ghost">Go to Menu setup</a>' +
+        '</div>'
+      );
       view.innerHTML = bodyHtml;
       return;
     }
@@ -839,9 +857,15 @@
     }).join('');
     view.innerHTML = '' +
       '<div class="menu-page">' +
-        '<div class="menu-page-head"><h1>Menu setup</h1><button class="btn primary" id="addItemBtn" type="button">+ Add item</button></div>' +
+        '<div class="menu-page-head">' +
+          '<h1>Menu setup</h1>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+            '<button class="btn ghost seed-default-btn" type="button" title="Load the 12 standard Smoke Signal BBQ items">Load Starter Menu</button>' +
+            '<button class="btn primary" id="addItemBtn" type="button">+ Add item</button>' +
+          '</div>' +
+        '</div>' +
         '<p class="kicker">Changes here update the Order tab for everyone within a few seconds.</p>' +
-        (menuItems.length ? groups : emptyState('No menu items yet', 'Add your first item below to start taking orders.')) +
+        (menuItems.length ? groups : emptyState('No menu items yet', 'Load the starter Smoke Signal BBQ menu or create custom items.', '<button class="btn primary seed-default-btn" type="button" style="margin-top:14px;">Load Starter Menu (12 items)</button>')) +
       '</div>';
     var addBtn = qs('#addItemBtn'); if (addBtn) addBtn.addEventListener('click', function(){ openItemModal(null); });
   }
@@ -1029,6 +1053,9 @@
     });
 
     document.body.addEventListener('click', function(e){
+      var seedBtn = e.target.closest('.seed-default-btn');
+      if (seedBtn) { onSeedDefaultClick(); return; }
+
       var chip = e.target.closest('.filter-chip');
       if (chip) { currentFilter = chip.dataset.cat; renderOrderView(); return; }
 
