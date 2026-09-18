@@ -299,7 +299,8 @@
   .history-row-body .order-notes{ margin-top:6px; }
   .status-pill{ justify-self:start; font-size:11px; font-weight:700; padding:3px 10px; border-radius:var(--radius-pill); }
   .pill-placed{ background:rgba(171,151,129,0.18); color:var(--text-muted); }
-  .pill-cooking{ background:rgba(242,170,60,0.18); color:var(--amber); }
+  .pill-cooking, .pill-in-process{ background:rgba(242,170,60,0.18); color:var(--amber); }
+  .pill-cooking-finished{ background:rgba(240,97,31,0.25); color:var(--ember); }
   .pill-delivered{ background:rgba(111,162,135,0.18); color:var(--sage); }
   .pill-cancelled{ background:rgba(163,64,63,0.18); color:var(--wine); }
 
@@ -529,7 +530,7 @@
   async function refreshOrders(){
     try {
       allOrders = await apiGet('/api/orders');
-      boardOrders = allOrders.filter(function(o){ return o.status === 'placed' || o.status === 'in_process'; });
+      boardOrders = allOrders.filter(function(o){ return o.status === 'placed' || o.status === 'in_process' || o.status === 'cooking_finished'; });
       deliveredOrders = allOrders.filter(function(o){ return o.status === 'delivered'; })
         .sort(function(a, b){ return (b.updatedAt || 0) - (a.updatedAt || 0); }).slice(0, 100);
       cancelledOrders = allOrders.filter(function(o){ return o.status === 'cancelled'; })
@@ -766,10 +767,13 @@
       actions = '<button class="btn primary small advance-btn" data-order="' + order.id + '" data-next="in_process">Start cooking</button>' +
         '<button class="btn ghost danger small cancel-btn" data-order="' + order.id + '" data-num="' + order.orderNumber + '">Cancel</button>';
     } else if (col === 'in_process') {
-      actions = '<button class="btn primary small advance-btn" data-order="' + order.id + '" data-next="delivered">Mark delivered</button>' +
+      actions = '<button class="btn primary small advance-btn" data-order="' + order.id + '" data-next="cooking_finished">Cooking finished</button>' +
         '<button class="btn ghost small advance-btn" data-order="' + order.id + '" data-next="placed">Back</button>';
+    } else if (col === 'cooking_finished') {
+      actions = '<button class="btn primary small advance-btn" data-order="' + order.id + '" data-next="delivered">Mark delivered</button>' +
+        '<button class="btn ghost small advance-btn" data-order="' + order.id + '" data-next="in_process">Back</button>';
     } else {
-      actions = '<button class="btn ghost small advance-btn" data-order="' + order.id + '" data-next="in_process">Undo</button>';
+      actions = '<button class="btn ghost small advance-btn" data-order="' + order.id + '" data-next="cooking_finished">Undo</button>';
     }
     return '' +
       '<article class="order-card ' + urg + '">' +
@@ -784,14 +788,17 @@
   function renderKitchenView(){
     var placed = boardOrders.filter(function(o){ return o.status === 'placed'; }).sort(function(a, b){ return a.createdAt - b.createdAt; });
     var cooking = boardOrders.filter(function(o){ return o.status === 'in_process'; }).sort(function(a, b){ return a.createdAt - b.createdAt; });
+    var ready = boardOrders.filter(function(o){ return o.status === 'cooking_finished'; }).sort(function(a, b){ return (a.updatedAt || a.createdAt) - (b.updatedAt || b.createdAt); });
     var done = deliveredOrders;
     var view = qs('#view');
     view.innerHTML = '' +
       '<div class="kitchen-page">' +
-        '<p class="kicker">Tap “Start cooking” or “Mark delivered” to move an order forward. Updates appear on every open screen within a few seconds.</p>' +
+        '<p class="kicker">Tap “Start cooking”, “Cooking finished”, or “Mark delivered” to move an order forward. Updates appear on every open screen within a few seconds.</p>' +
         '<div class="kstats">' +
           '<div class="kstat"><strong class="num">' + placed.length + '</strong><span>New</span></div>' +
           '<div class="kstat"><strong class="num">' + cooking.length + '</strong><span>Cooking</span></div>' +
+          '<div class="kstat"><strong class="num" style="color:var(--ember);">' + ready.length + '</strong><span>Cooking Finished</span></div>' +
+          '<div class="kstat"><strong class="num" style="color:var(--sage);">' + done.length + '</strong><span>Delivered</span></div>' +
           '<div class="kstat clickable" id="viewCancelledBtn"><strong class="num">' + cancelledOrders.length + '</strong><span>Cancelled</span></div>' +
         '</div>' +
         '<div class="board">' +
@@ -800,6 +807,9 @@
           '</div>' +
           '<div class="board-col"><h2 class="col-title">Cooking<span class="col-count num">' + cooking.length + '</span></h2>' +
             '<div class="col-list">' + (cooking.length ? cooking.map(function(o){ return orderCardHtml(o, 'in_process'); }).join('') : emptyColHtml('Nothing on the grill')) + '</div>' +
+          '</div>' +
+          '<div class="board-col"><h2 class="col-title">Cooking Finished<span class="col-count num">' + ready.length + '</span></h2>' +
+            '<div class="col-list">' + (ready.length ? ready.map(function(o){ return orderCardHtml(o, 'cooking_finished'); }).join('') : emptyColHtml('None ready')) + '</div>' +
           '</div>' +
           '<div class="board-col"><h2 class="col-title">Delivered<span class="col-count num">' + done.length + '</span></h2>' +
             '<div class="col-list">' + (done.length ? done.map(function(o){ return orderCardHtml(o, 'delivered'); }).join('') : emptyColHtml('None yet')) + '</div>' +
@@ -912,8 +922,21 @@
   }
 
   // ---------------- History view ----------------
-  var HISTORY_STATUSES = [['All','All'],['placed','Placed'],['in_process','Cooking'],['delivered','Delivered'],['cancelled','Cancelled']];
-  var STATUS_LABELS = { placed:'Placed', in_process:'Cooking', delivered:'Delivered', cancelled:'Cancelled' };
+  var HISTORY_STATUSES = [
+    ['All','All'],
+    ['placed','Placed'],
+    ['in_process','Cooking'],
+    ['cooking_finished','Cooking Finished'],
+    ['delivered','Delivered'],
+    ['cancelled','Cancelled']
+  ];
+  var STATUS_LABELS = {
+    placed: 'Placed',
+    in_process: 'Cooking',
+    cooking_finished: 'Cooking Finished',
+    delivered: 'Delivered',
+    cancelled: 'Cancelled'
+  };
 
   function formatDateTime(ts){
     if (!ts) return '';

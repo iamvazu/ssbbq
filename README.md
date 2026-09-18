@@ -4,7 +4,7 @@ Order-taking + kitchen dashboard for the Smoke Signal BBQ stall, built to run
 on your own Vercel account instead of inside Claude.
 
 - **Order** — menu grid, cart, checkout.
-- **Kitchen** — live board: Placed → Cooking → Delivered, plus a cancelled log.
+- **Kitchen** — live board: Placed → Cooking → Cooking Finished → Delivered, plus a cancelled log.
 - **Menu** — add, edit, price, or 86 (sold-out) any item — no code needed.
 - **History** — every order, searchable, with totals and a CSV export.
 

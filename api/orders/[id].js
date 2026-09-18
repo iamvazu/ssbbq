@@ -1,7 +1,7 @@
 import { getRedis } from '../lib/redis.js';
 
 const ORDERS_KEY = 'orders';
-const VALID_STATUSES = ['placed', 'in_process', 'delivered', 'cancelled'];
+const VALID_STATUSES = ['placed', 'in_process', 'cooking_finished', 'delivered', 'cancelled'];
 
 export default async function handler(req, res) {
   const { id } = req.query;
