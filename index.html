@@ -552,12 +552,20 @@
     dot.title = connected ? 'Connected' : 'Reconnecting…';
   }
 
+  var lastOrdersHash = '';
+  var lastMenuHash = '';
+
   async function refreshMenu(){
     try {
-      menuItems = await apiGet('/api/menu');
+      var items = await apiGet('/api/menu');
       connected = true; updateConnDot();
-      if (currentRoute === 'order') renderOrderView();
-      if (currentRoute === 'menu') renderMenuView();
+      var hash = JSON.stringify(items);
+      if (hash !== lastMenuHash) {
+        lastMenuHash = hash;
+        menuItems = items;
+        if (currentRoute === 'order') renderOrderView();
+        if (currentRoute === 'menu') renderMenuView();
+      }
     } catch (e) {
       console.error('menu refresh failed', e);
       connected = false; updateConnDot();
@@ -566,17 +574,22 @@
 
   async function refreshOrders(){
     try {
-      allOrders = await apiGet('/api/orders');
-      boardOrders = allOrders.filter(function(o){ return o.status === 'placed' || o.status === 'in_process' || o.status === 'cooking_finished'; });
-      deliveredOrders = allOrders.filter(function(o){ return o.status === 'delivered'; })
-        .sort(function(a, b){ return (b.updatedAt || 0) - (a.updatedAt || 0); }).slice(0, 100);
-      cancelledOrders = allOrders.filter(function(o){ return o.status === 'cancelled'; })
-        .sort(function(a, b){ return (b.updatedAt || 0) - (a.updatedAt || 0); }).slice(0, 100);
+      var orders = await apiGet('/api/orders');
       connected = true; updateConnDot();
-      updateNavBadge();
-      if (currentRoute === 'kitchen') renderKitchenView();
-      if (currentRoute === 'history') renderHistoryBody();
-      renderCancelledModal();
+      var hash = JSON.stringify(orders);
+      if (hash !== lastOrdersHash) {
+        lastOrdersHash = hash;
+        allOrders = orders;
+        boardOrders = allOrders.filter(function(o){ return o.status === 'placed' || o.status === 'in_process' || o.status === 'cooking_finished'; });
+        deliveredOrders = allOrders.filter(function(o){ return o.status === 'delivered'; })
+          .sort(function(a, b){ return (b.updatedAt || 0) - (a.updatedAt || 0); }).slice(0, 100);
+        cancelledOrders = allOrders.filter(function(o){ return o.status === 'cancelled'; })
+          .sort(function(a, b){ return (b.updatedAt || 0) - (a.updatedAt || 0); }).slice(0, 100);
+        updateNavBadge();
+        if (currentRoute === 'kitchen') renderKitchenView();
+        if (currentRoute === 'history') renderHistoryBody();
+        renderCancelledModal();
+      }
     } catch (e) {
       console.error('orders refresh failed', e);
       connected = false; updateConnDot();
@@ -601,8 +614,6 @@
 
     await Promise.all([refreshMenu(), refreshOrders()]);
     startPolling();
-
-    setInterval(function(){ if (currentRoute === 'kitchen') renderKitchenView(); }, 20000);
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function(){
@@ -700,6 +711,7 @@
   }
 
   function renderOrderView(){
+    var spWin = window.scrollY || document.documentElement.scrollTop || 0;
     var view = qs('#view');
     var available = menuItems.filter(function(m){ return m.available !== false; });
     var bodyHtml;
@@ -713,6 +725,7 @@
         '</div>'
       );
       view.innerHTML = bodyHtml;
+      window.scrollTo(0, spWin);
       return;
     }
     if (available.length === 0) {
@@ -731,6 +744,7 @@
       bodyHtml = '<div class="item-grid">' + items.map(itemCardHtml).join('') + '</div>';
     }
     view.innerHTML = '<div class="order-page">' + chipsHtml() + bodyHtml + '</div>';
+    window.scrollTo(0, spWin);
   }
 
   function updateCartBar(){
@@ -827,33 +841,68 @@
     var cooking = boardOrders.filter(function(o){ return o.status === 'in_process'; }).sort(function(a, b){ return a.createdAt - b.createdAt; });
     var ready = boardOrders.filter(function(o){ return o.status === 'cooking_finished'; }).sort(function(a, b){ return (a.updatedAt || a.createdAt) - (b.updatedAt || b.createdAt); });
     var done = deliveredOrders;
+
+    var existingPage = qs('#kitchenPage');
+    if (existingPage) {
+      var spPlaced = qs('#placedList') ? qs('#placedList').scrollTop : 0;
+      var spCooking = qs('#cookingList') ? qs('#cookingList').scrollTop : 0;
+      var spReady = qs('#readyList') ? qs('#readyList').scrollTop : 0;
+      var spDelivered = qs('#deliveredList') ? qs('#deliveredList').scrollTop : 0;
+      var spWin = window.scrollY || document.documentElement.scrollTop || 0;
+
+      if (qs('#kstatPlaced')) qs('#kstatPlaced').textContent = placed.length;
+      if (qs('#kstatCooking')) qs('#kstatCooking').textContent = cooking.length;
+      if (qs('#kstatReady')) qs('#kstatReady').textContent = ready.length;
+      if (qs('#kstatDone')) qs('#kstatDone').textContent = done.length;
+      if (qs('#kstatCancelled')) qs('#kstatCancelled').textContent = cancelledOrders.length;
+
+      if (qs('#kcountPlaced')) qs('#kcountPlaced').textContent = placed.length;
+      if (qs('#kcountCooking')) qs('#kcountCooking').textContent = cooking.length;
+      if (qs('#kcountReady')) qs('#kcountReady').textContent = ready.length;
+      if (qs('#kcountDone')) qs('#kcountDone').textContent = done.length;
+
+      if (qs('#placedList')) qs('#placedList').innerHTML = placed.length ? placed.map(function(o){ return orderCardHtml(o, 'placed'); }).join('') : emptyColHtml('No new orders');
+      if (qs('#cookingList')) qs('#cookingList').innerHTML = cooking.length ? cooking.map(function(o){ return orderCardHtml(o, 'in_process'); }).join('') : emptyColHtml('Nothing on the grill');
+      if (qs('#readyList')) qs('#readyList').innerHTML = ready.length ? ready.map(function(o){ return orderCardHtml(o, 'cooking_finished'); }).join('') : emptyColHtml('None ready');
+      if (qs('#deliveredList')) qs('#deliveredList').innerHTML = done.length ? done.map(function(o){ return orderCardHtml(o, 'delivered'); }).join('') : emptyColHtml('None yet');
+
+      if (qs('#placedList')) qs('#placedList').scrollTop = spPlaced;
+      if (qs('#cookingList')) qs('#cookingList').scrollTop = spCooking;
+      if (qs('#readyList')) qs('#readyList').scrollTop = spReady;
+      if (qs('#deliveredList')) qs('#deliveredList').scrollTop = spDelivered;
+      window.scrollTo(0, spWin);
+      return;
+    }
+
+    var spWin = window.scrollY || document.documentElement.scrollTop || 0;
     var view = qs('#view');
     view.innerHTML = '' +
-      '<div class="kitchen-page">' +
+      '<div class="kitchen-page" id="kitchenPage">' +
         '<p class="kicker">Tap “Start cooking”, “Cooking finished”, or “Mark delivered” to move an order forward. Updates appear on every open screen within a few seconds.</p>' +
         '<div class="kstats">' +
-          '<div class="kstat"><strong class="num">' + placed.length + '</strong><span>New</span></div>' +
-          '<div class="kstat"><strong class="num">' + cooking.length + '</strong><span>Cooking</span></div>' +
-          '<div class="kstat"><strong class="num" style="color:var(--ember);">' + ready.length + '</strong><span>Cooking Finished</span></div>' +
-          '<div class="kstat"><strong class="num" style="color:var(--sage);">' + done.length + '</strong><span>Delivered</span></div>' +
-          '<div class="kstat clickable" id="viewCancelledBtn"><strong class="num">' + cancelledOrders.length + '</strong><span>Cancelled</span></div>' +
+          '<div class="kstat"><strong class="num" id="kstatPlaced">' + placed.length + '</strong><span>New</span></div>' +
+          '<div class="kstat"><strong class="num" id="kstatCooking">' + cooking.length + '</strong><span>Cooking</span></div>' +
+          '<div class="kstat"><strong class="num" id="kstatReady" style="color:var(--ember);">' + ready.length + '</strong><span>Cooking Finished</span></div>' +
+          '<div class="kstat"><strong class="num" id="kstatDone" style="color:var(--sage);">' + done.length + '</strong><span>Delivered</span></div>' +
+          '<div class="kstat clickable" id="viewCancelledBtn"><strong class="num" id="kstatCancelled">' + cancelledOrders.length + '</strong><span>Cancelled</span></div>' +
         '</div>' +
         '<div class="board">' +
-          '<div class="board-col"><h2 class="col-title">Placed<span class="col-count num">' + placed.length + '</span></h2>' +
-            '<div class="col-list">' + (placed.length ? placed.map(function(o){ return orderCardHtml(o, 'placed'); }).join('') : emptyColHtml('No new orders')) + '</div>' +
+          '<div class="board-col"><h2 class="col-title">Placed<span class="col-count num" id="kcountPlaced">' + placed.length + '</span></h2>' +
+            '<div class="col-list" id="placedList">' + (placed.length ? placed.map(function(o){ return orderCardHtml(o, 'placed'); }).join('') : emptyColHtml('No new orders')) + '</div>' +
           '</div>' +
-          '<div class="board-col"><h2 class="col-title">Cooking<span class="col-count num">' + cooking.length + '</span></h2>' +
-            '<div class="col-list">' + (cooking.length ? cooking.map(function(o){ return orderCardHtml(o, 'in_process'); }).join('') : emptyColHtml('Nothing on the grill')) + '</div>' +
+          '<div class="board-col"><h2 class="col-title">Cooking<span class="col-count num" id="kcountCooking">' + cooking.length + '</span></h2>' +
+            '<div class="col-list" id="cookingList">' + (cooking.length ? cooking.map(function(o){ return orderCardHtml(o, 'in_process'); }).join('') : emptyColHtml('Nothing on the grill')) + '</div>' +
           '</div>' +
-          '<div class="board-col"><h2 class="col-title">Cooking Finished<span class="col-count num">' + ready.length + '</span></h2>' +
-            '<div class="col-list">' + (ready.length ? ready.map(function(o){ return orderCardHtml(o, 'cooking_finished'); }).join('') : emptyColHtml('None ready')) + '</div>' +
+          '<div class="board-col"><h2 class="col-title">Cooking Finished<span class="col-count num" id="kcountReady">' + ready.length + '</span></h2>' +
+            '<div class="col-list" id="readyList">' + (ready.length ? ready.map(function(o){ return orderCardHtml(o, 'cooking_finished'); }).join('') : emptyColHtml('None ready')) + '</div>' +
           '</div>' +
-          '<div class="board-col"><h2 class="col-title">Delivered<span class="col-count num">' + done.length + '</span></h2>' +
-            '<div class="col-list">' + (done.length ? done.map(function(o){ return orderCardHtml(o, 'delivered'); }).join('') : emptyColHtml('None yet')) + '</div>' +
+          '<div class="board-col"><h2 class="col-title">Delivered<span class="col-count num" id="kcountDone">' + done.length + '</span></h2>' +
+            '<div class="col-list" id="deliveredList">' + (done.length ? done.map(function(o){ return orderCardHtml(o, 'delivered'); }).join('') : emptyColHtml('None yet')) + '</div>' +
           '</div>' +
         '</div>' +
       '</div>';
     var vb = qs('#viewCancelledBtn'); if (vb) vb.addEventListener('click', openCancelledModal);
+    window.scrollTo(0, spWin);
   }
 
   async function onAdvanceClick(orderId, next){
@@ -894,6 +943,7 @@
   }
 
   function renderMenuView(){
+    var spWin = window.scrollY || document.documentElement.scrollTop || 0;
     var view = qs('#view');
     var groups = CATEGORIES.map(function(cat){
       var items = menuItems.filter(function(m){ return m.category === cat; })
@@ -915,6 +965,7 @@
         (menuItems.length ? groups : emptyState('No menu items yet', 'Load the starter Smoke Signal BBQ menu or create custom items.', '<button class="btn primary seed-default-btn" type="button" style="margin-top:14px;">Load Starter Menu (12 items)</button>')) +
       '</div>';
     var addBtn = qs('#addItemBtn'); if (addBtn) addBtn.addEventListener('click', function(){ openItemModal(null); });
+    window.scrollTo(0, spWin);
   }
 
   function openItemModal(id){
@@ -1052,6 +1103,7 @@
 
   function renderHistoryList(){
     var el = qs('#historyListContainer'); if (!el) return;
+    var spWin = window.scrollY || document.documentElement.scrollTop || 0;
     var q = historySearch.trim().toLowerCase();
     var filtered = allOrders.filter(function(o){
       if (historyFilter !== 'All' && o.status !== historyFilter) return false;
@@ -1064,12 +1116,14 @@
     });
     if (filtered.length === 0) {
       el.innerHTML = emptyState('No orders match', allOrders.length ? 'Try a different filter or search.' : 'Orders will show up here once the first one is placed.');
+      window.scrollTo(0, spWin);
       return;
     }
     el.innerHTML = '<div class="history-list">' +
       '<div class="history-row-labels"><span></span><span>Time</span><span>Customer</span><span>Items</span><span>Total</span><span>Status</span></div>' +
       filtered.map(historyRowHtml).join('') +
       '</div>';
+    window.scrollTo(0, spWin);
   }
 
   function csvEscape(v){
