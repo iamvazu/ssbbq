@@ -239,37 +239,26 @@
   .pay-lbl{ font-size:11px; text-transform:uppercase; color:var(--text-faint); font-weight:700; }
   .pay-amount{ font-size:24px; font-weight:800; color:var(--amber); }
 
-  .pay-method-chips{ display:flex; gap:8px; margin-bottom:14px; }
-  .pay-method-chip{ flex:1; text-align:center; padding:9px 12px; border-radius:var(--radius-pill); cursor:pointer; }
-  .pay-method-chip.active{ background:var(--ember); border-color:var(--ember); color:#ffffff; font-weight:700; }
-
   .upi-qr-card{
-    background:#ffffff; border-radius:14px; padding:14px; margin-bottom:16px;
-    display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px;
+    background:#ffffff; border-radius:14px; padding:16px; margin-bottom:18px;
+    display:flex; flex-direction:column; align-items:center; text-align:center; gap:12px;
     box-shadow:0 8px 24px rgba(0,0,0,0.35);
   }
   .qr-frame{
-    width:100%; max-width:240px; aspect-ratio:1/1;
+    width:100%; max-width:250px; aspect-ratio:1/1;
     overflow:hidden; border-radius:10px; display:flex; align-items:center; justify-content:center;
     background:#ffffff;
   }
   .qr-img{ width:100%; height:100%; object-fit:contain; display:block; }
-  .qr-instructions{ display:flex; flex-direction:column; gap:2px; color:#140F0D; }
-  .qr-instructions strong{ font-size:14.5px; font-weight:800; }
-  .qr-instructions span{ font-size:11.5px; color:#66554B; font-weight:600; }
+  .qr-instructions{ display:flex; flex-direction:column; gap:3px; color:#140F0D; }
+  .qr-instructions strong{ font-size:15px; font-weight:800; }
+  .qr-instructions span{ font-size:12px; color:#66554B; font-weight:600; }
 
-  .cash-card{
-    background:var(--surface-2); border:1px dashed var(--border);
-    border-radius:14px; padding:24px 16px; margin-bottom:16px;
-    display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px;
+  .pay-confirm-btn{
+    font-size:16px; padding:15px 20px; background:var(--sage); color:#ffffff; font-weight:800;
+    box-shadow:0 6px 18px rgba(78,159,118,0.35); letter-spacing:.01em;
   }
-  .cash-icon{ font-size:36px; line-height:1; margin-bottom:4px; }
-
-  .pay-actions-grid{ display:flex; flex-direction:column; gap:8px; }
-  .pay-confirm-btn{ font-size:15px; padding:13px 20px; background:var(--sage); color:#ffffff; }
-  .pay-confirm-btn:hover{ background:var(--sage-dark); }
-  .pay-pending-btn{ border-color:var(--amber); color:var(--amber); }
-  .pay-pending-btn:hover{ background:rgba(255,77,79,0.12); }
+  .pay-confirm-btn:hover{ background:var(--sage-dark); transform:translateY(-1px); }
 
   /* Payment Pill */
   .pay-pill{
@@ -608,7 +597,7 @@
     <div class="modal payment-modal">
       <div class="modal-header">
         <button class="icon-btn" id="backToCartBtn" aria-label="Back to Cart" title="Back to Cart">←</button>
-        <h2>Collect Payment</h2>
+        <h2>Scan &amp; Pay</h2>
         <button class="icon-btn" id="closePaymentModalBtn" aria-label="Close">✕</button>
       </div>
       <div class="pay-summary-box">
@@ -617,14 +606,9 @@
           <span class="pay-items-count muted" id="payItemsSummary">0 items</span>
         </div>
         <div class="pay-amount-box">
-          <span class="pay-lbl">Amount Due</span>
+          <span class="pay-lbl">Total to Pay</span>
           <strong class="pay-amount num" id="payTotalAmt">₹0</strong>
         </div>
-      </div>
-
-      <div class="pay-method-chips">
-        <button type="button" class="chip pay-method-chip active" id="payMethodUpiBtn" data-method="upi">📱 UPI QR</button>
-        <button type="button" class="chip pay-method-chip" id="payMethodCashBtn" data-method="cash">💵 Cash</button>
       </div>
 
       <div id="upiQrWrap" class="upi-qr-card">
@@ -632,25 +616,14 @@
           <img src="/payment-qr.jpg" alt="UPI Payment QR Code" class="qr-img" />
         </div>
         <div class="qr-instructions">
-          <strong>Scan &amp; Pay with any UPI App</strong>
+          <strong>Scan &amp; Pay via UPI</strong>
           <span>GPay • PhonePe • Paytm • BHIM • Cred</span>
         </div>
       </div>
 
-      <div id="cashWrap" class="cash-card" style="display:none;">
-        <div class="cash-icon">💵</div>
-        <strong>Collect Cash at Counter</strong>
-        <span class="muted">Confirm exact cash received before completing</span>
-      </div>
-
-      <div class="pay-actions-grid">
-        <button class="btn primary block pay-confirm-btn" id="confirmPaidBtn" type="button">
-          ✅ Payment Done (Send to Kitchen)
-        </button>
-        <button class="btn ghost block pay-pending-btn" id="placePendingBtn" type="button">
-          ⏳ Place Order (Payment Pending)
-        </button>
-      </div>
+      <button class="btn primary block pay-confirm-btn" id="confirmPaidBtn" type="button">
+        ✅ Confirm Payment Received &amp; Place Order
+      </button>
     </div>
   </div>
 
@@ -1201,8 +1174,6 @@
   function openCartModal(){ renderCartItems(); qs('#cartModal').classList.add('open'); }
   function closeCartModal(){ qs('#cartModal').classList.remove('open'); }
 
-  var selectedPayMethod = 'upi';
-
   function onGoToPaymentClick(){
     var nameInput = qs('#custNameInput');
     var name = nameInput.value.trim();
@@ -1216,22 +1187,8 @@
     qs('#payItemsSummary').textContent = count + ' item' + (count === 1 ? '' : 's') + ' in cart';
     qs('#payTotalAmt').textContent = fmtMoney(total);
 
-    setPaymentMethod('upi');
     closeCartModal();
     qs('#paymentModal').classList.add('open');
-  }
-
-  function setPaymentMethod(method){
-    selectedPayMethod = method;
-    var upiBtn = qs('#payMethodUpiBtn');
-    var cashBtn = qs('#payMethodCashBtn');
-    if (upiBtn) upiBtn.classList.toggle('active', method === 'upi');
-    if (cashBtn) cashBtn.classList.toggle('active', method === 'cash');
-
-    var upiWrap = qs('#upiQrWrap');
-    var cashWrap = qs('#cashWrap');
-    if (upiWrap) upiWrap.style.display = method === 'upi' ? 'flex' : 'none';
-    if (cashWrap) cashWrap.style.display = method === 'cash' ? 'flex' : 'none';
   }
 
   function closePaymentModal(){
@@ -1244,31 +1201,27 @@
     openCartModal();
   }
 
-  async function processOrderCheckout(payStatus){
+  async function processOrderCheckout(){
     var name = qs('#custNameInput').value.trim();
     var notes = qs('#orderNotesInput').value.trim();
     if (!name || Object.keys(cart).length === 0) return;
 
-    var btn1 = qs('#confirmPaidBtn');
-    var btn2 = qs('#placePendingBtn');
-    if (btn1) btn1.disabled = true;
-    if (btn2) btn2.disabled = true;
+    var btn = qs('#confirmPaidBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Placing Order…'; }
 
     try {
-      var num = await placeOrderNow(name, notes, payStatus, selectedPayMethod);
+      var num = await placeOrderNow(name, notes, 'paid', 'upi');
       closePaymentModal();
       qs('#custNameInput').value = '';
       qs('#orderNotesInput').value = '';
-      var payMsg = payStatus === 'paid' ? ('Paid via ' + (selectedPayMethod === 'cash' ? 'Cash' : 'UPI')) : 'Payment Pending';
-      showToast('Order ' + tokenLabel(num) + ' placed — ' + payMsg + '!');
+      showToast('Order ' + tokenLabel(num) + ' placed — Payment Confirmed!');
       renderOrderView();
       updateCartBar();
     } catch(e) {
       console.error(e);
       showToast('Could not place order: ' + (e.message || 'Error'), true);
     } finally {
-      if (btn1) btn1.disabled = false;
-      if (btn2) btn2.disabled = false;
+      if (btn) { btn.disabled = false; btn.innerHTML = '✅ Confirm Payment Received &amp; Place Order'; }
     }
   }
 
@@ -1818,14 +1771,8 @@
     if (backCartBtn) backCartBtn.addEventListener('click', onBackToCartClick);
     var closePayBtn = qs('#closePaymentModalBtn');
     if (closePayBtn) closePayBtn.addEventListener('click', closePaymentModal);
-    var payUpiBtn = qs('#payMethodUpiBtn');
-    if (payUpiBtn) payUpiBtn.addEventListener('click', function(){ setPaymentMethod('upi'); });
-    var payCashBtn = qs('#payMethodCashBtn');
-    if (payCashBtn) payCashBtn.addEventListener('click', function(){ setPaymentMethod('cash'); });
     var confirmPaidBtn = qs('#confirmPaidBtn');
-    if (confirmPaidBtn) confirmPaidBtn.addEventListener('click', function(){ processOrderCheckout('paid'); });
-    var placePendingBtn = qs('#placePendingBtn');
-    if (placePendingBtn) placePendingBtn.addEventListener('click', function(){ processOrderCheckout('pending'); });
+    if (confirmPaidBtn) confirmPaidBtn.addEventListener('click', processOrderCheckout);
 
     qs('#saveItemBtn').addEventListener('click', onSaveItemClick);
     qsa('.modal-overlay').forEach(function(ov){
