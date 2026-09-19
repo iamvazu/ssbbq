@@ -437,14 +437,17 @@
     display:grid; grid-template-columns:1fr; gap:18px;
   }
   @media (min-width: 900px){
-    .pit-layout{ grid-template-columns: 420px 1fr; }
+    .pit-layout{ grid-template-columns: 420px 1fr; align-items:start; }
+    .pit-matrix-panel{ max-height:calc(100vh - 140px); overflow-y:auto; }
+    .pit-ticket-list{ max-height:calc(100vh - 200px); overflow-y:auto; }
   }
 
   /* Left Panel: Matrix */
   .pit-matrix-panel{
     background:var(--surface); border:1px solid var(--border);
     border-radius:var(--radius-card); padding:16px; display:flex; flex-direction:column; gap:12px;
-    max-height:calc(100vh - 160px); overflow-y:auto; -webkit-overflow-scrolling:touch;
+    -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain;
+    scrollbar-width:thin; scrollbar-color:var(--border) transparent;
   }
   .pit-matrix-title{ font-size:20px; display:flex; justify-content:space-between; align-items:center; }
   .matrix-cat-title{ font-size:14px; color:var(--amber); text-transform:uppercase; letter-spacing:.05em; font-weight:700; margin:10px 0 4px; }
@@ -490,8 +493,8 @@
   }
   .pit-ticket-list{
     display:flex; flex-direction:column; gap:12px;
-    max-height:calc(100vh - 220px); overflow-y:auto; -webkit-overflow-scrolling:touch;
-    padding-right:4px;
+    -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain;
+    padding-right:4px; scrollbar-width:thin; scrollbar-color:var(--border) transparent;
   }
   .pit-ticket{
     background:var(--surface); border:1px solid var(--border); border-left:6px solid var(--text-faint);
@@ -1453,32 +1456,63 @@
     var cookingCount = activeOrders.filter(function(o){ return o.status === 'in_process'; }).length;
     var readyCount = activeOrders.filter(function(o){ return o.status === 'cooking_finished'; }).length;
 
+    var chipsContentHtml = '' +
+      '<button class="chip pit-filter-btn' + (pitFilter === 'all' ? ' active' : '') + '" data-filter="all">All Active (' + activeOrders.length + ')</button>' +
+      '<button class="chip pit-filter-btn' + (pitFilter === 'placed' ? ' active' : '') + '" data-filter="placed">🔥 Placed (' + placedCount + ')</button>' +
+      '<button class="chip pit-filter-btn' + (pitFilter === 'in_process' ? ' active' : '') + '" data-filter="in_process">♨️ Cooking (' + cookingCount + ')</button>' +
+      '<button class="chip pit-filter-btn' + (pitFilter === 'cooking_finished' ? ' active' : '') + '" data-filter="cooking_finished">🍽️ Ready (' + readyCount + ')</button>';
+
+    var existingPage = qs('#pitmasterPage');
+    if (existingPage) {
+      var spMatrix = qs('#pitMatrixPanel') ? qs('#pitMatrixPanel').scrollTop : 0;
+      var spTicketList = qs('#pitTicketList') ? qs('#pitTicketList').scrollTop : 0;
+      var spWin = window.scrollY || document.documentElement.scrollTop || 0;
+
+      if (qs('#pitStatPlacedNum')) qs('#pitStatPlacedNum').textContent = demand.totalPlaced;
+      if (qs('#pitStatCookingNum')) qs('#pitStatCookingNum').textContent = demand.totalCooking;
+      if (qs('#pitStatReadyNum')) qs('#pitStatReadyNum').textContent = demand.totalReady;
+
+      var batchAllBtn = qs('#pitBatchAllBtn');
+      if (batchAllBtn) batchAllBtn.disabled = demand.totalPlaced === 0;
+
+      var matrixCards = qs('#pitMatrixCards');
+      if (matrixCards) matrixCards.innerHTML = matrixGroupsHtml;
+
+      var chipsWrap = qs('#pitFilterChips');
+      if (chipsWrap) chipsWrap.innerHTML = chipsContentHtml;
+
+      var ticketList = qs('#pitTicketList');
+      if (ticketList) ticketList.innerHTML = ticketsHtml;
+
+      if (qs('#pitMatrixPanel')) qs('#pitMatrixPanel').scrollTop = spMatrix;
+      if (qs('#pitTicketList')) qs('#pitTicketList').scrollTop = spTicketList;
+      window.scrollTo(0, spWin);
+      return;
+    }
+
+    var spWin = window.scrollY || document.documentElement.scrollTop || 0;
+    var view = qs('#view');
     view.innerHTML = '' +
-      '<div class="pitmaster-page">' +
+      '<div class="pitmaster-page" id="pitmasterPage">' +
         '<div class="pit-header">' +
           '<h1 class="pit-title">🔥 Pit Master Command</h1>' +
           '<div class="pit-quick-stats">' +
-            '<span class="pit-stat-pill" style="border-color:var(--amber);"><strong style="color:var(--amber);">' + demand.totalPlaced + '</strong> Items to Grill</span>' +
-            '<span class="pit-stat-pill" style="border-color:var(--ember);"><strong style="color:var(--ember);">' + demand.totalCooking + '</strong> Items on Grill</span>' +
-            '<span class="pit-stat-pill" style="border-color:var(--sage);"><strong style="color:var(--sage);">' + demand.totalReady + '</strong> Ready to Serve</span>' +
+            '<span class="pit-stat-pill" style="border-color:var(--amber);"><strong style="color:var(--amber);" id="pitStatPlacedNum">' + demand.totalPlaced + '</strong> Items to Grill</span>' +
+            '<span class="pit-stat-pill" style="border-color:var(--ember);"><strong style="color:var(--ember);" id="pitStatCookingNum">' + demand.totalCooking + '</strong> Items on Grill</span>' +
+            '<span class="pit-stat-pill" style="border-color:var(--sage);"><strong style="color:var(--sage);" id="pitStatReadyNum">' + demand.totalReady + '</strong> Ready to Serve</span>' +
           '</div>' +
         '</div>' +
         '<div class="pit-layout">' +
-          '<div class="pit-matrix-panel">' +
-            '<div class="pit-matrix-title"><strong>Grill Demand Matrix</strong><button class="btn ghost small batch-all-btn" data-from="placed" data-to="in_process" ' + (demand.totalPlaced === 0 ? 'disabled' : '') + '>Put All on Grill</button></div>' +
-            matrixGroupsHtml +
+          '<div class="pit-matrix-panel" id="pitMatrixPanel">' +
+            '<div class="pit-matrix-title"><strong>Grill Demand Matrix</strong><button class="btn ghost small batch-all-btn" id="pitBatchAllBtn" data-from="placed" data-to="in_process" ' + (demand.totalPlaced === 0 ? 'disabled' : '') + '>Put All on Grill</button></div>' +
+            '<div id="pitMatrixCards" style="display:flex;flex-direction:column;gap:12px;">' + matrixGroupsHtml + '</div>' +
           '</div>' +
           '<div class="pit-stream-panel">' +
             '<div class="pit-stream-controls">' +
-              '<div class="chips" style="padding-bottom:0;margin-bottom:0;">' +
-                '<button class="chip pit-filter-btn' + (pitFilter === 'all' ? ' active' : '') + '" data-filter="all">All Active (' + activeOrders.length + ')</button>' +
-                '<button class="chip pit-filter-btn' + (pitFilter === 'placed' ? ' active' : '') + '" data-filter="placed">🔥 Placed (' + placedCount + ')</button>' +
-                '<button class="chip pit-filter-btn' + (pitFilter === 'in_process' ? ' active' : '') + '" data-filter="in_process">♨️ Cooking (' + cookingCount + ')</button>' +
-                '<button class="chip pit-filter-btn' + (pitFilter === 'cooking_finished' ? ' active' : '') + '" data-filter="cooking_finished">🍽️ Ready (' + readyCount + ')</button>' +
-              '</div>' +
+              '<div class="chips" id="pitFilterChips" style="padding-bottom:0;margin-bottom:0;">' + chipsContentHtml + '</div>' +
               '<input type="search" id="pitSearchInput" class="pit-search" placeholder="Search order #, customer or item…" value="' + escapeHtml(pitSearch) + '" />' +
             '</div>' +
-            '<div class="pit-ticket-list">' + ticketsHtml + '</div>' +
+            '<div class="pit-ticket-list" id="pitTicketList">' + ticketsHtml + '</div>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -1487,9 +1521,7 @@
     if (searchEl) {
       searchEl.addEventListener('input', function(){
         pitSearch = searchEl.value;
-        var spTicket = qs('.pit-ticket-list') ? qs('.pit-ticket-list').scrollTop : 0;
         renderPitmasterView();
-        if (qs('.pit-ticket-list')) qs('.pit-ticket-list').scrollTop = spTicket;
       });
     }
 
