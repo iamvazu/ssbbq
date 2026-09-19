@@ -597,7 +597,7 @@
     <div class="modal payment-modal">
       <div class="modal-header">
         <button class="icon-btn" id="backToCartBtn" aria-label="Back to Cart" title="Back to Cart">←</button>
-        <h2>Scan &amp; Pay</h2>
+        <h2>BITS Pilani Payment Gateway</h2>
         <button class="icon-btn" id="closePaymentModalBtn" aria-label="Close">✕</button>
       </div>
       <div class="pay-summary-box">
@@ -613,11 +613,11 @@
 
       <div id="upiQrWrap" class="upi-qr-card">
         <div class="qr-frame">
-          <img src="/payment-qr.jpg" alt="UPI Payment QR Code" class="qr-img" />
+          <img src="/payment-qr.jpg" alt="BITS Pilani Payment Gateway QR Code" class="qr-img" />
         </div>
         <div class="qr-instructions">
-          <strong>Scan &amp; Pay via UPI</strong>
-          <span>GPay • PhonePe • Paytm • BHIM • Cred</span>
+          <strong>BITS Pilani Payment Gateway</strong>
+          <span>Scan with BITS Pilani Payment Gateway to pay</span>
         </div>
       </div>
 
@@ -953,11 +953,10 @@
 
   function paymentPillHtml(order){
     var isPending = order.paymentStatus === 'pending';
-    var method = order.paymentMethod ? (order.paymentMethod === 'cash' ? 'Cash' : 'UPI') : '';
     if (isPending) {
       return '<span class="pay-pill pending">⏳ Pay Pending<button class="mark-paid-btn" data-order="' + order.id + '" type="button">✓ Mark Paid</button></span>';
     }
-    return '<span class="pay-pill paid">✓ Paid' + (method ? (' (' + method + ')') : '') + '</span>';
+    return '<span class="pay-pill paid">✓ Paid</span>';
   }
 
   async function placeOrderNow(customerName, notes, paymentStatus, paymentMethod){
@@ -1725,7 +1724,7 @@
     return s;
   }
   function buildOrdersCsv(orders){
-    var rows = [['Order', 'Placed at', 'Customer', 'Items', 'Total', 'Payment Status', 'Payment Method', 'Status', 'Notes']];
+    var rows = [['Order', 'Placed at', 'Customer', 'Items', 'Total', 'Payment', 'Status', 'Notes']];
     orders.forEach(function(o){
       var itemsStr = (o.items || []).map(function(it){ return it.qty + 'x ' + it.name; }).join('; ');
       rows.push([
@@ -1734,8 +1733,7 @@
         o.customerName || '',
         itemsStr,
         o.total,
-        (o.paymentStatus === 'pending' ? 'Pending' : 'Paid'),
-        (o.paymentMethod || 'upi').toUpperCase(),
+        (o.paymentStatus === 'pending' ? 'Pending' : 'Paid (BITS Gateway)'),
         STATUS_LABELS[o.status] || o.status,
         o.notes || ''
       ]);
