@@ -33,6 +33,9 @@ export default async function handler(req, res) {
         : 'o-' + Date.now() + '-' + Math.random().toString(36).slice(2);
       const now = Date.now();
 
+      const paymentStatus = body.paymentStatus === 'pending' ? 'pending' : 'paid';
+      const paymentMethod = body.paymentMethod === 'cash' ? 'cash' : 'upi';
+
       const order = {
         id,
         orderNumber,
@@ -41,6 +44,8 @@ export default async function handler(req, res) {
         customerName: String(body.customerName || '').slice(0, 40),
         notes: String(body.notes || '').slice(0, 140),
         status: 'placed',
+        paymentStatus,
+        paymentMethod,
         createdAt: now,
         updatedAt: now
       };

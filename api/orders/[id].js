@@ -17,11 +17,28 @@ export default async function handler(req, res) {
       if (!existing) return res.status(404).json({ error: 'Order not found' });
 
       const body = req.body || {};
-      if (!VALID_STATUSES.includes(body.status)) {
-        return res.status(400).json({ error: 'status must be one of: ' + VALID_STATUSES.join(', ') });
+      const patch = { updatedAt: Date.now() };
+
+      if (body.status !== undefined) {
+        if (!VALID_STATUSES.includes(body.status)) {
+          return res.status(400).json({ error: 'status must be one of: ' + VALID_STATUSES.join(', ') });
+        }
+        patch.status = body.status;
       }
 
-      const updated = Object.assign({}, existing, { status: body.status, updatedAt: Date.now() });
+      if (body.paymentStatus !== undefined) {
+        if (['paid', 'pending'].includes(body.paymentStatus)) {
+          patch.paymentStatus = body.paymentStatus;
+        }
+      }
+
+      if (body.paymentMethod !== undefined) {
+        if (['upi', 'cash'].includes(body.paymentMethod)) {
+          patch.paymentMethod = body.paymentMethod;
+        }
+      }
+
+      const updated = Object.assign({}, existing, patch);
       await redis.hset(ORDERS_KEY, { [id]: updated });
       return res.status(200).json(updated);
     }
