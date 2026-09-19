@@ -9,36 +9,7 @@ export default async function handler(req, res) {
 
     if (req.method === 'GET') {
       const orders = await redis.hgetall(ORDERS_KEY);
-      let list = orders ? Object.values(orders) : [];
-
-      // Auto-purge the test orders (#135 'Vasu test' and #002 'Vasu') from Redis database
-      const testIdsToDelete = [];
-      list = list.filter((o) => {
-        const num = Number(o.orderNumber);
-        const name = String(o.customerName || '').trim().toLowerCase();
-        const isTargetTest =
-          num === 135 ||
-          num === 2 ||
-          name === 'vasu test' ||
-          (name.includes('vasu') && (num === 135 || num === 2 || o.total === 350 || o.total === 950));
-
-        if (isTargetTest && o.id) {
-          testIdsToDelete.push(o.id);
-          return false;
-        }
-        return true;
-      });
-
-      if (testIdsToDelete.length > 0) {
-        for (const tid of testIdsToDelete) {
-          try {
-            await redis.hdel(ORDERS_KEY, tid);
-          } catch (e) {
-            console.error('Failed to auto-delete test order', tid, e);
-          }
-        }
-      }
-
+      const list = orders ? Object.values(orders) : [];
       return res.status(200).json(list);
     }
 
