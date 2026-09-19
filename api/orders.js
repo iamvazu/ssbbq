@@ -77,7 +77,57 @@ export default async function handler(req, res) {
       return res.status(200).json({ deleted: targetIds });
     }
 
-    res.setHeader('Allow', 'GET, POST, DELETE');
+    if (req.method === 'PATCH') {
+      const body = req.body || {};
+      const { ids, status, itemName, fromStatus, toStatus } = body;
+      const validStatuses = ['placed', 'in_process', 'cooking_finished', 'delivered', 'cancelled'];
+
+      const targetStatus = status || toStatus;
+      if (!targetStatus || !validStatuses.includes(targetStatus)) {
+        return res.status(400).json({ error: 'Valid target status is required: ' + validStatuses.join(', ') });
+      }
+
+      const all = await redis.hgetall(ORDERS_KEY);
+      if (!all) return res.status(200).json({ updated: 0 });
+
+      const updates = {};
+      let updateCount = 0;
+      const now = Date.now();
+
+      if (Array.isArray(ids) && ids.length > 0) {
+        ids.forEach((id) => {
+          if (all[id]) {
+            updates[id] = Object.assign({}, all[id], { status: targetStatus, updatedAt: now });
+            updateCount++;
+          }
+        });
+      } else if (itemName) {
+        const needle = String(itemName).trim().toLowerCase();
+        Object.values(all).forEach((o) => {
+          if (fromStatus && o.status !== fromStatus) return;
+          const hasItem = (o.items || []).some((it) => String(it.name || '').trim().toLowerCase() === needle || String(it.id || '') === itemName);
+          if (hasItem) {
+            updates[o.id] = Object.assign({}, o, { status: targetStatus, updatedAt: now });
+            updateCount++;
+          }
+        });
+      } else if (fromStatus) {
+        Object.values(all).forEach((o) => {
+          if (o.status === fromStatus) {
+            updates[o.id] = Object.assign({}, o, { status: targetStatus, updatedAt: now });
+            updateCount++;
+          }
+        });
+      }
+
+      if (updateCount > 0) {
+        await redis.hset(ORDERS_KEY, updates);
+      }
+
+      return res.status(200).json({ updated: updateCount, status: targetStatus });
+    }
+
+    res.setHeader('Allow', 'GET, POST, PATCH, DELETE');
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (err) {
     console.error('orders handler error', err);

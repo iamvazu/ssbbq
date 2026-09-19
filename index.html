@@ -339,6 +339,141 @@
   .toast.show{ opacity:1; transform:translateY(0); }
   .toast.error{ border-color:var(--wine); color:#FADCDC; }
 
+  /* ---------------- Live Batch Production Bar (Option A) ---------------- */
+  .batch-command-bar{
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-card); padding:14px 18px; margin-bottom:18px;
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.25);
+  }
+  .batch-col{ display:flex; flex-direction:column; gap:10px; }
+  .batch-col-head{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+  .batch-title{ font-family:var(--font-display); font-size:17px; letter-spacing:.02em; display:flex; align-items:center; gap:6px; }
+  .batch-col.placed .batch-title{ color:var(--amber); }
+  .batch-col.cooking .batch-title{ color:var(--ember); }
+  .batch-total-tag{ font-size:12px; font-weight:700; background:var(--surface-2); padding:3px 10px; border-radius:var(--radius-pill); color:var(--text); }
+  .batch-chips-wrap{ display:flex; flex-wrap:wrap; gap:8px; }
+  .batch-item-chip{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--surface-2); border:1px solid var(--border);
+    border-radius:var(--radius-pill); padding:5px 12px 5px 14px;
+    font-size:13px; font-weight:600; color:var(--text);
+  }
+  .batch-item-chip .num-badge{ font-weight:800; font-size:14px; color:var(--amber); }
+  .batch-item-chip .batch-btn{
+    border:none; background:var(--ember); color:#fff;
+    border-radius:var(--radius-pill); font-size:11.5px; font-weight:700;
+    padding:3px 8px; cursor:pointer; display:inline-flex; align-items:center; gap:3px;
+    transition:opacity .15s ease, transform .1s ease;
+  }
+  .batch-item-chip .batch-btn:hover{ opacity:.9; transform:scale(1.03); }
+  .batch-item-chip .batch-btn.ready-btn{ background:var(--sage); color:#fff; }
+  .batch-empty{ font-size:12.5px; color:var(--text-faint); font-style:italic; padding:4px 0; }
+
+  /* ---------------- Pit Master Screen (Option B & C) ---------------- */
+  .pitmaster-page .pit-header{
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:12px; margin-bottom:16px;
+  }
+  .pitmaster-page .pit-title{ font-size:28px; color:var(--text); display:flex; align-items:center; gap:8px; }
+  .pit-quick-stats{ display:flex; gap:8px; flex-wrap:wrap; }
+  .pit-stat-pill{
+    background:var(--surface); border:1px solid var(--border);
+    padding:6px 14px; border-radius:var(--radius-pill); font-size:13px; font-weight:600;
+    display:flex; align-items:center; gap:6px;
+  }
+  .pit-stat-pill strong{ font-size:15px; }
+
+  .pit-layout{
+    display:grid; grid-template-columns:1fr; gap:18px;
+  }
+  @media (min-width: 900px){
+    .pit-layout{ grid-template-columns: 420px 1fr; }
+  }
+
+  /* Left Panel: Matrix */
+  .pit-matrix-panel{
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-card); padding:16px; display:flex; flex-direction:column; gap:12px;
+    max-height:calc(100vh - 160px); overflow-y:auto; -webkit-overflow-scrolling:touch;
+  }
+  .pit-matrix-title{ font-size:20px; display:flex; justify-content:space-between; align-items:center; }
+  .matrix-cat-title{ font-size:14px; color:var(--amber); text-transform:uppercase; letter-spacing:.05em; font-weight:700; margin:10px 0 4px; }
+  .matrix-card{
+    background:var(--surface-2); border:1px solid var(--border-soft);
+    border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:8px;
+    transition:border-color .15s ease;
+  }
+  .matrix-card.has-demand{ border-color:var(--ember); background:rgba(217,34,40,0.06); }
+  .matrix-card-top{ display:flex; justify-content:space-between; align-items:baseline; }
+  .matrix-card-name{ font-weight:700; font-size:14.5px; }
+  .matrix-card-price{ font-size:12.5px; color:var(--text-faint); font-weight:600; }
+  .matrix-stages-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; background:var(--bg);
+    padding:6px 8px; border-radius:8px; text-align:center;
+  }
+  .matrix-stage-box{ display:flex; flex-direction:column; align-items:center; }
+  .matrix-stage-lbl{ font-size:10.5px; text-transform:uppercase; color:var(--text-faint); font-weight:700; }
+  .matrix-stage-val{ font-size:18px; font-weight:800; line-height:1.2; font-family:var(--font-display); }
+  .matrix-stage-val.val-placed{ color:var(--amber); }
+  .matrix-stage-val.val-cooking{ color:var(--ember); }
+  .matrix-stage-val.val-ready{ color:var(--sage); }
+  .matrix-card-actions{ display:flex; gap:6px; }
+  .matrix-btn{
+    flex:1; border:none; padding:7px 10px; border-radius:var(--radius-pill);
+    font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:4px;
+    transition:opacity .15s ease;
+  }
+  .matrix-btn.to-grill{ background:var(--ember); color:#ffffff; }
+  .matrix-btn.to-ready{ background:var(--sage); color:#ffffff; }
+  .matrix-btn:disabled{ opacity:.35; cursor:not-allowed; }
+
+  /* Right Panel: Active Order Stream */
+  .pit-stream-panel{
+    display:flex; flex-direction:column; gap:12px;
+  }
+  .pit-stream-controls{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+  }
+  .pit-search{
+    flex:1 1 200px; background:var(--surface-2); border:1px solid var(--border);
+    color:var(--text); border-radius:10px; padding:8px 12px; font-size:13.5px;
+  }
+  .pit-ticket-list{
+    display:flex; flex-direction:column; gap:12px;
+    max-height:calc(100vh - 220px); overflow-y:auto; -webkit-overflow-scrolling:touch;
+    padding-right:4px;
+  }
+  .pit-ticket{
+    background:var(--surface); border:1px solid var(--border); border-left:6px solid var(--text-faint);
+    border-radius:var(--radius-card); padding:16px 18px; display:flex; flex-direction:column; gap:10px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.25);
+  }
+  .pit-ticket.urgency-ok{ border-left-color:var(--sage); }
+  .pit-ticket.urgency-warn{ border-left-color:var(--amber); }
+  .pit-ticket.urgency-late{ border-left-color:var(--wine); }
+  .pit-ticket.urgency-done{ border-left-color:var(--sage-dark); opacity:.85; }
+  .pit-ticket-head{ display:flex; justify-content:space-between; align-items:baseline; }
+  .pit-ticket-num{ font-family:var(--font-display); font-size:26px; color:var(--ember); letter-spacing:.02em; }
+  .pit-ticket-meta{ display:flex; align-items:center; gap:10px; }
+  .pit-ticket-time{ font-size:13px; color:var(--text-faint); }
+  .pit-ticket-cust{ font-size:17px; font-weight:800; color:var(--text); }
+  .pit-ticket-items{
+    list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px;
+    font-size:15px; font-weight:600; color:var(--text);
+  }
+  .pit-ticket-items li strong{ color:var(--amber); margin-right:4px; }
+  .pit-ticket-notes{ font-size:13px; color:var(--amber); font-style:italic; background:rgba(255,77,79,0.1); padding:6px 10px; border-radius:6px; }
+  .pit-ticket-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+  .pit-action-btn{
+    flex:1 1 160px; padding:12px 18px; border-radius:var(--radius-pill); border:none;
+    font-size:14.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .pit-action-btn.grill{ background:var(--ember); color:#ffffff; }
+  .pit-action-btn.ready{ background:var(--amber); color:#140F0D; }
+  .pit-action-btn.deliver{ background:var(--sage); color:#ffffff; }
+  .pit-action-btn.back{ flex:0 0 auto; background:transparent; border:1px solid var(--border); color:var(--text-muted); font-size:13px; font-weight:600; padding:8px 14px; }
+
   @media (max-width:720px){
     .history-row-labels{ display:none; }
     .history-row-head{
@@ -377,6 +512,7 @@
     <nav class="tabs">
       <a href="#order" class="nav-tab" id="tabOrder">Order</a>
       <a href="#kitchen" class="nav-tab" id="tabKitchen">Kitchen<span id="kitchenBadge" class="nav-badge"></span></a>
+      <a href="#pitmaster" class="nav-tab" id="tabPitmaster">🔥 Pit Master<span id="pitmasterBadge" class="nav-badge"></span></a>
       <a href="#menu" class="nav-tab" id="tabMenu">Menu</a>
       <a href="#history" class="nav-tab" id="tabHistory">History</a>
     </nav>
@@ -458,6 +594,8 @@
   var historySearch = '';
   var expandedOrders = {};
   var editingItemId = null;
+  var pitSearch = '';
+  var pitFilter = 'all';
 
   // ---------------- Small utilities ----------------
   function qs(sel, ctx){ return (ctx || document).querySelector(sel); }
@@ -500,6 +638,97 @@
     return '<div class="empty-state"><h2>' + escapeHtml(title) + '</h2><p>' + escapeHtml(sub) + '</p>' + (extraHtml || '') + '</div>';
   }
   function emptyColHtml(msg){ return '<p class="empty-col">' + escapeHtml(msg) + '</p>'; }
+
+  // ---------------- Demand & Batch Calculations ----------------
+  function computeGrillDemand(){
+    var demand = {};
+    menuItems.forEach(function(m){
+      demand[m.name] = { id: m.id, name: m.name, category: m.category, price: m.price, placed: 0, cooking: 0, ready: 0, total: 0 };
+    });
+
+    allOrders.forEach(function(o){
+      if (o.status === 'cancelled' || o.status === 'delivered') return;
+      (o.items || []).forEach(function(it){
+        var key = it.name;
+        if (!demand[key]) {
+          demand[key] = { id: it.id, name: it.name, category: 'Other', price: it.price || 0, placed: 0, cooking: 0, ready: 0, total: 0 };
+        }
+        var q = it.qty || 1;
+        if (o.status === 'placed') demand[key].placed += q;
+        else if (o.status === 'in_process') demand[key].cooking += q;
+        else if (o.status === 'cooking_finished') demand[key].ready += q;
+        demand[key].total += q;
+      });
+    });
+
+    var list = Object.values(demand);
+    return {
+      items: list,
+      totalPlaced: list.reduce(function(s, x){ return s + x.placed; }, 0),
+      totalCooking: list.reduce(function(s, x){ return s + x.cooking; }, 0),
+      totalReady: list.reduce(function(s, x){ return s + x.ready; }, 0)
+    };
+  }
+
+  function refreshLocalOrderLists(){
+    boardOrders = allOrders.filter(function(o){ return o.status === 'placed' || o.status === 'in_process' || o.status === 'cooking_finished'; });
+    deliveredOrders = allOrders.filter(function(o){ return o.status === 'delivered'; })
+      .sort(function(a, b){ return (b.updatedAt || 0) - (a.updatedAt || 0); }).slice(0, 100);
+    cancelledOrders = allOrders.filter(function(o){ return o.status === 'cancelled'; })
+      .sort(function(a, b){ return (b.updatedAt || 0) - (a.updatedAt || 0); }).slice(0, 100);
+  }
+
+  async function batchAdvanceItem(itemName, fromStatus, toStatus){
+    if (!itemName) return;
+    var targetLabel = toStatus === 'in_process' ? 'the Grill' : (toStatus === 'cooking_finished' ? 'Ready to Serve' : toStatus);
+    showToast('Moving ' + itemName + ' to ' + targetLabel + '…');
+    var now = Date.now();
+    allOrders.forEach(function(o){
+      if (o.status === fromStatus && (o.items || []).some(function(it){ return it.name === itemName || it.id === itemName; })) {
+        o.status = toStatus;
+        o.updatedAt = now;
+      }
+    });
+    refreshLocalOrderLists();
+    updateNavBadge();
+    if (currentRoute === 'kitchen') renderKitchenView();
+    if (currentRoute === 'pitmaster') renderPitmasterView();
+
+    try {
+      await apiSend('/api/orders', 'PATCH', { itemName: itemName, fromStatus: fromStatus, toStatus: toStatus });
+      await refreshOrders();
+      showToast('All ' + itemName + ' moved to ' + targetLabel + '!');
+    } catch(e) {
+      console.error(e);
+      showToast('Batch update error: ' + (e.message || 'Error'), true);
+    }
+  }
+
+  async function batchAdvanceAll(fromStatus, toStatus){
+    var label = fromStatus === 'placed' ? 'ALL Placed orders to the Grill' : 'ALL Cooking orders to Ready to Serve';
+    if (!confirm('Move ' + label + '?')) return;
+    showToast('Moving orders…');
+    var now = Date.now();
+    allOrders.forEach(function(o){
+      if (o.status === fromStatus) {
+        o.status = toStatus;
+        o.updatedAt = now;
+      }
+    });
+    refreshLocalOrderLists();
+    updateNavBadge();
+    if (currentRoute === 'kitchen') renderKitchenView();
+    if (currentRoute === 'pitmaster') renderPitmasterView();
+
+    try {
+      await apiSend('/api/orders', 'PATCH', { fromStatus: fromStatus, toStatus: toStatus });
+      await refreshOrders();
+      showToast('Orders moved successfully!');
+    } catch(e) {
+      console.error(e);
+      showToast('Batch move error: ' + (e.message || 'Error'), true);
+    }
+  }
 
   // ---------------- Cart draft persistence (per device, local only) ----------------
   function loadCartDraft(){
@@ -567,6 +796,7 @@
         menuItems = items;
         if (currentRoute === 'order') renderOrderView();
         if (currentRoute === 'menu') renderMenuView();
+        if (currentRoute === 'pitmaster') renderPitmasterView();
       }
     } catch (e) {
       console.error('menu refresh failed', e);
@@ -582,13 +812,10 @@
       if (hash !== lastOrdersHash) {
         lastOrdersHash = hash;
         allOrders = orders;
-        boardOrders = allOrders.filter(function(o){ return o.status === 'placed' || o.status === 'in_process' || o.status === 'cooking_finished'; });
-        deliveredOrders = allOrders.filter(function(o){ return o.status === 'delivered'; })
-          .sort(function(a, b){ return (b.updatedAt || 0) - (a.updatedAt || 0); }).slice(0, 100);
-        cancelledOrders = allOrders.filter(function(o){ return o.status === 'cancelled'; })
-          .sort(function(a, b){ return (b.updatedAt || 0) - (a.updatedAt || 0); }).slice(0, 100);
+        refreshLocalOrderLists();
         updateNavBadge();
         if (currentRoute === 'kitchen') renderKitchenView();
+        if (currentRoute === 'pitmaster') renderPitmasterView();
         if (currentRoute === 'history') renderHistoryBody();
         renderCancelledModal();
       }
@@ -625,11 +852,19 @@
   }
 
   function updateNavBadge(){
-    var badge = qs('#kitchenBadge');
-    if (!badge) return;
-    var n = boardOrders.length;
-    badge.textContent = n > 0 ? n : '';
-    badge.classList.toggle('show', n > 0);
+    var kb = qs('#kitchenBadge');
+    if (kb) {
+      var n = boardOrders.length;
+      kb.textContent = n > 0 ? n : '';
+      kb.classList.toggle('show', n > 0);
+    }
+    var pb = qs('#pitmasterBadge');
+    if (pb) {
+      var demand = computeGrillDemand();
+      var p = demand.totalPlaced;
+      pb.textContent = p > 0 ? (p + ' to grill') : '';
+      pb.classList.toggle('show', p > 0);
+    }
   }
 
   async function placeOrderNow(customerName, notes){
@@ -646,6 +881,19 @@
   }
 
   async function advanceStatus(orderId, next){
+    var now = Date.now();
+    allOrders.forEach(function(o){
+      if (o.id === orderId) {
+        o.status = next;
+        o.updatedAt = now;
+      }
+    });
+    refreshLocalOrderLists();
+    updateNavBadge();
+    if (currentRoute === 'kitchen') renderKitchenView();
+    if (currentRoute === 'pitmaster') renderPitmasterView();
+    if (currentRoute === 'history') renderHistoryBody();
+
     await apiSend('/api/orders/' + orderId, 'PATCH', { status: next });
     await refreshOrders();
   }
@@ -666,9 +914,10 @@
       console.error(e);
       allOrders = allOrders.filter(function(o){ return o.id !== orderId; });
       delete expandedOrders[orderId];
-      if (currentTab === 'history') renderHistoryBody();
-      else if (currentTab === 'kitchen') renderKitchenBoard();
-      updateKitchenBadge();
+      if (currentRoute === 'history') renderHistoryBody();
+      else if (currentRoute === 'kitchen') renderKitchenView();
+      else if (currentRoute === 'pitmaster') renderPitmasterView();
+      updateNavBadge();
       showToast('Order ' + tokenLabel(orderNum) + ' deleted.');
     }
   }
@@ -695,12 +944,13 @@
   // ---------------- Routing ----------------
   function route(){
     var h = (location.hash || '#order').replace('#', '');
-    currentRoute = ['order', 'kitchen', 'menu', 'history'].indexOf(h) >= 0 ? h : 'order';
+    currentRoute = ['order', 'kitchen', 'pitmaster', 'menu', 'history'].indexOf(h) >= 0 ? h : 'order';
     qsa('.nav-tab').forEach(function(a){
       a.classList.toggle('active', a.getAttribute('href') === '#' + currentRoute);
     });
     if (currentRoute === 'order') renderOrderView();
     else if (currentRoute === 'kitchen') renderKitchenView();
+    else if (currentRoute === 'pitmaster') renderPitmasterView();
     else if (currentRoute === 'menu') renderMenuView();
     else renderHistoryPage();
     updateCartBar();
@@ -827,6 +1077,44 @@
   }
 
   // ---------------- Kitchen view ----------------
+  function batchCommandBarHtml(){
+    var demand = computeGrillDemand();
+    var placedItems = demand.items.filter(function(x){ return x.placed > 0; });
+    var cookingItems = demand.items.filter(function(x){ return x.cooking > 0; });
+
+    var placedChips = placedItems.length ? placedItems.map(function(it){
+      return '<span class="batch-item-chip">' +
+        '<strong class="num-badge">' + it.placed + '×</strong> ' + escapeHtml(it.name) +
+        '<button class="batch-btn batch-item-btn" data-item="' + escapeHtml(it.name) + '" data-from="placed" data-to="in_process" title="Move all ' + escapeHtml(it.name) + ' to Grill">▶ Grill</button>' +
+      '</span>';
+    }).join('') : '<span class="batch-empty">Grill queue clear — no orders waiting to cook</span>';
+
+    var cookingChips = cookingItems.length ? cookingItems.map(function(it){
+      return '<span class="batch-item-chip">' +
+        '<strong class="num-badge" style="color:var(--ember);">' + it.cooking + '×</strong> ' + escapeHtml(it.name) +
+        '<button class="batch-btn ready-btn batch-item-btn" data-item="' + escapeHtml(it.name) + '" data-from="in_process" data-to="cooking_finished" title="Mark all ' + escapeHtml(it.name) + ' Ready">✓ Ready</button>' +
+      '</span>';
+    }).join('') : '<span class="batch-empty">Nothing currently on the grill</span>';
+
+    return '' +
+      '<div class="batch-command-bar" id="kitchenBatchBar">' +
+        '<div class="batch-col placed">' +
+          '<div class="batch-col-head">' +
+            '<span class="batch-title">🔥 BATCH GRILL QUEUE <span class="batch-total-tag">' + demand.totalPlaced + ' to cook</span></span>' +
+            (demand.totalPlaced > 0 ? '<button class="btn primary small batch-all-btn" data-from="placed" data-to="in_process">▶ Put ALL on Grill</button>' : '') +
+          '</div>' +
+          '<div class="batch-chips-wrap">' + placedChips + '</div>' +
+        '</div>' +
+        '<div class="batch-col cooking">' +
+          '<div class="batch-col-head">' +
+            '<span class="batch-title">♨️ ACTIVE ON GRILL <span class="batch-total-tag">' + demand.totalCooking + ' cooking</span></span>' +
+            (demand.totalCooking > 0 ? '<button class="btn ghost small batch-all-btn" data-from="in_process" data-to="cooking_finished" style="border-color:var(--ember);color:var(--ember);">✓ Mark ALL Cooked</button>' : '') +
+          '</div>' +
+          '<div class="batch-chips-wrap">' + cookingChips + '</div>' +
+        '</div>' +
+      '</div>';
+  }
+
   function orderCardHtml(order, col){
     var elapsedTs = col === 'delivered' ? (order.updatedAt || order.createdAt) : order.createdAt;
     var urg = col === 'delivered' ? 'urgency-done' : urgencyClass(order.createdAt);
@@ -870,6 +1158,9 @@
       var spDelivered = qs('#deliveredList') ? qs('#deliveredList').scrollTop : 0;
       var spWin = window.scrollY || document.documentElement.scrollTop || 0;
 
+      var batchWrap = qs('#kitchenBatchBarWrap');
+      if (batchWrap) batchWrap.innerHTML = batchCommandBarHtml();
+
       if (qs('#kstatPlaced')) qs('#kstatPlaced').textContent = placed.length;
       if (qs('#kstatCooking')) qs('#kstatCooking').textContent = cooking.length;
       if (qs('#kstatReady')) qs('#kstatReady').textContent = ready.length;
@@ -898,7 +1189,7 @@
     var view = qs('#view');
     view.innerHTML = '' +
       '<div class="kitchen-page" id="kitchenPage">' +
-        '<p class="kicker">Tap “Start cooking”, “Cooking finished”, or “Mark delivered” to move an order forward. Updates appear on every open screen within a few seconds.</p>' +
+        '<div id="kitchenBatchBarWrap">' + batchCommandBarHtml() + '</div>' +
         '<div class="kstats">' +
           '<div class="kstat"><strong class="num" id="kstatPlaced">' + placed.length + '</strong><span>New</span></div>' +
           '<div class="kstat"><strong class="num" id="kstatCooking">' + cooking.length + '</strong><span>Cooking</span></div>' +
@@ -922,6 +1213,131 @@
         '</div>' +
       '</div>';
     var vb = qs('#viewCancelledBtn'); if (vb) vb.addEventListener('click', openCancelledModal);
+    window.scrollTo(0, spWin);
+  }
+
+  // ---------------- Pit Master view (Option B & C) ----------------
+  function renderPitmasterView(){
+    var spWin = window.scrollY || document.documentElement.scrollTop || 0;
+    var view = qs('#view');
+    var demand = computeGrillDemand();
+    var activeOrders = boardOrders.slice().sort(function(a, b){ return a.createdAt - b.createdAt; });
+
+    var q = pitSearch.trim().toLowerCase();
+    var filteredTickets = activeOrders.filter(function(o){
+      if (pitFilter !== 'all' && o.status !== pitFilter) return false;
+      if (q) {
+        var matchNum = String(o.orderNumber).indexOf(q) >= 0;
+        var matchName = (o.customerName || '').toLowerCase().indexOf(q) >= 0;
+        var matchItem = (o.items || []).some(function(it){ return it.name.toLowerCase().indexOf(q) >= 0; });
+        if (!matchNum && !matchName && !matchItem) return false;
+      }
+      return true;
+    });
+
+    var matrixGroupsHtml = CATEGORIES.map(function(cat){
+      var items = demand.items.filter(function(x){ return x.category === cat; });
+      if (items.length === 0) return '';
+      var cardsHtml = items.map(function(it){
+        var hasDemand = it.placed > 0 || it.cooking > 0;
+        return '' +
+          '<div class="matrix-card' + (hasDemand ? ' has-demand' : '') + '">' +
+            '<div class="matrix-card-top">' +
+              '<span class="matrix-card-name">' + escapeHtml(it.name) + '</span>' +
+              '<span class="matrix-card-price">' + fmtMoney(it.price) + '</span>' +
+            '</div>' +
+            '<div class="matrix-stages-grid">' +
+              '<div class="matrix-stage-box"><span class="matrix-stage-lbl">To Grill</span><span class="matrix-stage-val val-placed">' + it.placed + '</span></div>' +
+              '<div class="matrix-stage-box"><span class="matrix-stage-lbl">Cooking</span><span class="matrix-stage-val val-cooking">' + it.cooking + '</span></div>' +
+              '<div class="matrix-stage-box"><span class="matrix-stage-lbl">Ready</span><span class="matrix-stage-val val-ready">' + it.ready + '</span></div>' +
+            '</div>' +
+            '<div class="matrix-card-actions">' +
+              '<button class="matrix-btn to-grill batch-item-btn" data-item="' + escapeHtml(it.name) + '" data-from="placed" data-to="in_process" ' + (it.placed === 0 ? 'disabled' : '') + '>🔥 Put ' + it.placed + ' on Grill</button>' +
+              '<button class="matrix-btn to-ready batch-item-btn" data-item="' + escapeHtml(it.name) + '" data-from="in_process" data-to="cooking_finished" ' + (it.cooking === 0 ? 'disabled' : '') + '>✓ ' + it.cooking + ' Ready</button>' +
+            '</div>' +
+          '</div>';
+      }).join('');
+      return '<div class="matrix-cat-section"><div class="matrix-cat-title">' + escapeHtml(cat) + '</div><div style="display:flex;flex-direction:column;gap:8px;">' + cardsHtml + '</div></div>';
+    }).join('');
+
+    var ticketsHtml = filteredTickets.length ? filteredTickets.map(function(o){
+      var urg = urgencyClass(o.createdAt);
+      var itemsList = (o.items || []).map(function(it){
+        return '<li><strong>' + it.qty + '×</strong> ' + escapeHtml(it.name) + '</li>';
+      }).join('');
+
+      var actionBtn = '';
+      if (o.status === 'placed') {
+        actionBtn = '<button class="pit-action-btn grill advance-btn" data-order="' + o.id + '" data-next="in_process">🔥 PUT ON GRILL</button>' +
+                    '<button class="pit-action-btn back cancel-btn" data-order="' + o.id + '" data-num="' + o.orderNumber + '">Cancel</button>';
+      } else if (o.status === 'in_process') {
+        actionBtn = '<button class="pit-action-btn ready advance-btn" data-order="' + o.id + '" data-next="cooking_finished">🥩 COOKED / READY TO SERVE</button>' +
+                    '<button class="pit-action-btn back advance-btn" data-order="' + o.id + '" data-next="placed">↩ Back</button>';
+      } else if (o.status === 'cooking_finished') {
+        actionBtn = '<button class="pit-action-btn deliver advance-btn" data-order="' + o.id + '" data-next="delivered">🎉 HAND TO CUSTOMER</button>' +
+                    '<button class="pit-action-btn back advance-btn" data-order="' + o.id + '" data-next="in_process">↩ Back</button>';
+      }
+
+      return '' +
+        '<div class="pit-ticket ' + urg + '">' +
+          '<div class="pit-ticket-head">' +
+            '<span class="pit-ticket-num">' + tokenLabel(o.orderNumber) + '</span>' +
+            '<div class="pit-ticket-meta">' +
+              '<span class="pit-ticket-time">' + timeAgo(o.createdAt) + '</span>' +
+              statusPillHtml(o.status) +
+            '</div>' +
+          '</div>' +
+          '<div class="pit-ticket-cust">' + escapeHtml(o.customerName || 'Walk-in Guest') + '</div>' +
+          '<ul class="pit-ticket-items">' + itemsList + '</ul>' +
+          (o.notes ? '<div class="pit-ticket-notes">“' + escapeHtml(o.notes) + '”</div>' : '') +
+          '<div class="pit-ticket-actions">' + actionBtn + '</div>' +
+        '</div>';
+    }).join('') : emptyState('No active orders', 'New orders will appear here automatically.');
+
+    var placedCount = activeOrders.filter(function(o){ return o.status === 'placed'; }).length;
+    var cookingCount = activeOrders.filter(function(o){ return o.status === 'in_process'; }).length;
+    var readyCount = activeOrders.filter(function(o){ return o.status === 'cooking_finished'; }).length;
+
+    view.innerHTML = '' +
+      '<div class="pitmaster-page">' +
+        '<div class="pit-header">' +
+          '<h1 class="pit-title">🔥 Pit Master Command</h1>' +
+          '<div class="pit-quick-stats">' +
+            '<span class="pit-stat-pill" style="border-color:var(--amber);"><strong style="color:var(--amber);">' + demand.totalPlaced + '</strong> Items to Grill</span>' +
+            '<span class="pit-stat-pill" style="border-color:var(--ember);"><strong style="color:var(--ember);">' + demand.totalCooking + '</strong> Items on Grill</span>' +
+            '<span class="pit-stat-pill" style="border-color:var(--sage);"><strong style="color:var(--sage);">' + demand.totalReady + '</strong> Ready to Serve</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="pit-layout">' +
+          '<div class="pit-matrix-panel">' +
+            '<div class="pit-matrix-title"><strong>Grill Demand Matrix</strong><button class="btn ghost small batch-all-btn" data-from="placed" data-to="in_process" ' + (demand.totalPlaced === 0 ? 'disabled' : '') + '>Put All on Grill</button></div>' +
+            matrixGroupsHtml +
+          '</div>' +
+          '<div class="pit-stream-panel">' +
+            '<div class="pit-stream-controls">' +
+              '<div class="chips" style="padding-bottom:0;margin-bottom:0;">' +
+                '<button class="chip pit-filter-btn' + (pitFilter === 'all' ? ' active' : '') + '" data-filter="all">All Active (' + activeOrders.length + ')</button>' +
+                '<button class="chip pit-filter-btn' + (pitFilter === 'placed' ? ' active' : '') + '" data-filter="placed">🔥 Placed (' + placedCount + ')</button>' +
+                '<button class="chip pit-filter-btn' + (pitFilter === 'in_process' ? ' active' : '') + '" data-filter="in_process">♨️ Cooking (' + cookingCount + ')</button>' +
+                '<button class="chip pit-filter-btn' + (pitFilter === 'cooking_finished' ? ' active' : '') + '" data-filter="cooking_finished">🍽️ Ready (' + readyCount + ')</button>' +
+              '</div>' +
+              '<input type="search" id="pitSearchInput" class="pit-search" placeholder="Search order #, customer or item…" value="' + escapeHtml(pitSearch) + '" />' +
+            '</div>' +
+            '<div class="pit-ticket-list">' + ticketsHtml + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    var searchEl = qs('#pitSearchInput');
+    if (searchEl) {
+      searchEl.addEventListener('input', function(){
+        pitSearch = searchEl.value;
+        var spTicket = qs('.pit-ticket-list') ? qs('.pit-ticket-list').scrollTop : 0;
+        renderPitmasterView();
+        if (qs('.pit-ticket-list')) qs('.pit-ticket-list').scrollTop = spTicket;
+      });
+    }
+
     window.scrollTo(0, spWin);
   }
 
@@ -1189,6 +1605,25 @@
     document.body.addEventListener('click', function(e){
       var seedBtn = e.target.closest('.seed-default-btn');
       if (seedBtn) { onSeedDefaultClick(); return; }
+
+      var batchItem = e.target.closest('.batch-item-btn');
+      if (batchItem) {
+        batchAdvanceItem(batchItem.dataset.item, batchItem.dataset.from, batchItem.dataset.to);
+        return;
+      }
+
+      var batchAll = e.target.closest('.batch-all-btn');
+      if (batchAll) {
+        batchAdvanceAll(batchAll.dataset.from, batchAll.dataset.to);
+        return;
+      }
+
+      var pitFilterBtn = e.target.closest('.pit-filter-btn');
+      if (pitFilterBtn) {
+        pitFilter = pitFilterBtn.dataset.filter;
+        renderPitmasterView();
+        return;
+      }
 
       var chip = e.target.closest('.filter-chip');
       if (chip) { currentFilter = chip.dataset.cat; renderOrderView(); return; }
