@@ -26,7 +26,12 @@ export default async function handler(req, res) {
       return res.status(200).json(updated);
     }
 
-    res.setHeader('Allow', 'PATCH');
+    if (req.method === 'DELETE') {
+      await redis.hdel(ORDERS_KEY, id);
+      return res.status(200).json({ deleted: true, id });
+    }
+
+    res.setHeader('Allow', 'PATCH, DELETE');
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (err) {
     console.error('orders/[id] handler error', err);

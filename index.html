@@ -22,20 +22,20 @@
      of the viewer's system theme. Tokens are still centralized on :root and
      re-affirmed under the dark-scheme guards for forward compatibility. */
   :root{
-    --bg:#15110D;
-    --surface:#211A14;
-    --surface-2:#2B221A;
-    --border:#3B2E22;
-    --border-soft:#2F251C;
-    --ember:#F0611F;
-    --ember-dark:#C2490F;
-    --amber:#F2AA3C;
-    --sage:#6FA287;
-    --sage-dark:#4C7A63;
-    --wine:#A3403F;
-    --text:#F6EEE2;
-    --text-muted:#AB9781;
-    --text-faint:#7C6C5A;
+    --bg:#140F0D;
+    --surface:#1F1613;
+    --surface-2:#2B1E19;
+    --border:#3F2921;
+    --border-soft:#2E1E18;
+    --ember:#D92228; /* Rich bold BBQ red matching the logo */
+    --ember-dark:#B0171C;
+    --amber:#FF4D4F; /* Warm bright red/coral highlight */
+    --sage:#4E9F76;
+    --sage-dark:#3B7A5A;
+    --wine:#991B1B;
+    --text:#FBF5EE;
+    --text-muted:#B8A394;
+    --text-faint:#806D60;
     --radius-card:14px;
     --radius-pill:999px;
     --font-display:'Staatliches', system-ui, sans-serif;
@@ -55,8 +55,8 @@
     color:var(--text);
     background-color:var(--bg);
     background-image:
-      radial-gradient(circle at 12% -10%, rgba(240,97,31,0.16), transparent 42%),
-      radial-gradient(circle at 92% 0%, rgba(242,170,60,0.10), transparent 38%);
+      radial-gradient(circle at 12% -10%, rgba(217,34,40,0.18), transparent 42%),
+      radial-gradient(circle at 92% 0%, rgba(255,77,79,0.12), transparent 38%);
     -webkit-font-smoothing:antialiased;
     padding-bottom:120px;
     overflow-x:hidden;
@@ -66,7 +66,7 @@
   h1,h2,h3{ margin:0; font-family:var(--font-display); font-weight:400; letter-spacing:.02em; }
   p{ margin:0; }
   button{ font-family:inherit; }
-  ::selection{ background:var(--ember); color:#1a1109; }
+  ::selection{ background:var(--ember); color:#ffffff; }
   :focus-visible{ outline:2px solid var(--ember); outline-offset:2px; }
   .muted{ color:var(--text-muted); font-size:14px; }
   .num{ font-variant-numeric: tabular-nums; }
@@ -82,7 +82,7 @@
     position:sticky; top:0; z-index:20;
     display:flex; align-items:center; gap:18px;
     padding:14px 20px;
-    background:rgba(21,17,13,0.92);
+    background:rgba(20,15,13,0.94);
     backdrop-filter:blur(8px);
     border-bottom:1px solid var(--border-soft);
   }
@@ -101,7 +101,7 @@
     transition:background .15s ease, color .15s ease;
     white-space:nowrap;
   }
-  .nav-tab.active{ background:var(--ember); color:#1a1109; }
+  .nav-tab.active{ background:var(--ember); color:#ffffff; font-weight:700; }
   .nav-badge{
     display:none; margin-left:6px; padding:1px 6px; border-radius:var(--radius-pill);
     background:var(--wine); color:#fff; font-size:11px; font-weight:700;
@@ -119,7 +119,7 @@
     border:1px solid var(--border); background:var(--surface); color:var(--text-muted);
     font-weight:600; font-size:14px; cursor:pointer;
   }
-  .chip.active{ background:var(--ember); border-color:var(--ember); color:#1a1109; }
+  .chip.active{ background:var(--ember); border-color:var(--ember); color:#ffffff; font-weight:700; }
 
   /* ---------------- Order page ---------------- */
   .cat-section{ margin-bottom:28px; }
@@ -141,7 +141,7 @@
     background:var(--surface-2); color:var(--text); font-size:18px; font-weight:700;
     display:flex; align-items:center; justify-content:center; cursor:pointer; line-height:1;
   }
-  .step-btn.add{ background:var(--ember); border-color:var(--ember); color:#1a1109; width:auto; padding:0 14px; border-radius:var(--radius-pill); font-size:14px; }
+  .step-btn.add{ background:var(--ember); border-color:var(--ember); color:#ffffff; width:auto; padding:0 14px; border-radius:var(--radius-pill); font-size:14px; }
   .stepper .qty{ min-width:18px; text-align:center; font-weight:700; }
   .stepper.small .step-btn{ width:28px; height:28px; font-size:15px; }
 
@@ -154,7 +154,7 @@
   .cart-bar{
     position:fixed; left:50%; bottom:18px; transform:translate(-50%, 140%);
     display:flex; align-items:center; gap:16px;
-    background:var(--ember); color:#1a1109; border:none;
+    background:var(--ember); color:#ffffff; border:none;
     padding:14px 22px; border-radius:var(--radius-pill);
     font-weight:700; font-size:14.5px; cursor:pointer;
     box-shadow:0 10px 30px rgba(0,0,0,.45);
@@ -162,7 +162,7 @@
     z-index:25;
   }
   .cart-bar.show{ transform:translate(-50%, 0); }
-  .cart-bar-cta{ opacity:.85; }
+  .cart-bar-cta{ opacity:.9; }
 
   /* ---------------- Modals ---------------- */
   .modal-overlay{
@@ -217,10 +217,11 @@
     padding:11px 20px; border-radius:var(--radius-pill); border:1px solid transparent;
     font-weight:700; font-size:14.5px; cursor:pointer; text-decoration:none;
   }
-  .btn.primary{ background:var(--ember); color:#1a1109; }
+  .btn.primary{ background:var(--ember); color:#ffffff; }
   .btn.primary:disabled{ opacity:.6; cursor:default; }
   .btn.ghost{ background:transparent; border-color:var(--border); color:var(--text); }
   .btn.ghost.danger{ color:var(--wine); border-color:rgba(163,64,63,0.4); }
+  .btn.ghost.danger:hover{ background:rgba(163,64,63,0.15); border-color:var(--wine); }
   .btn.block{ width:100%; }
   .btn.small{ padding:6px 14px; font-size:13px; }
 
@@ -319,12 +320,13 @@
   .history-row-body{ padding:0 16px 14px 16px; }
   .history-row-body .order-items{ color:var(--text-muted); }
   .history-row-body .order-notes{ margin-top:6px; }
+  .history-row-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:10px; padding-top:8px; border-top:1px dashed var(--border-soft); }
   .status-pill{ justify-self:start; font-size:11px; font-weight:700; padding:3px 10px; border-radius:var(--radius-pill); }
   .pill-placed{ background:rgba(171,151,129,0.18); color:var(--text-muted); }
-  .pill-cooking, .pill-in-process{ background:rgba(242,170,60,0.18); color:var(--amber); }
-  .pill-cooking-finished{ background:rgba(240,97,31,0.25); color:var(--ember); }
-  .pill-delivered{ background:rgba(111,162,135,0.18); color:var(--sage); }
-  .pill-cancelled{ background:rgba(163,64,63,0.18); color:var(--wine); }
+  .pill-cooking, .pill-in-process{ background:rgba(255,77,79,0.16); color:var(--amber); }
+  .pill-cooking-finished{ background:rgba(217,34,40,0.22); color:var(--ember); }
+  .pill-delivered{ background:rgba(78,159,118,0.18); color:var(--sage); }
+  .pill-cancelled{ background:rgba(153,27,27,0.22); color:var(--wine); }
 
   /* ---------------- Toasts ---------------- */
   .toast-container{ position:fixed; top:76px; left:50%; transform:translateX(-50%); z-index:60; display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none; }
@@ -651,6 +653,24 @@
     if (!confirm('Cancel order ' + tokenLabel(orderNum) + '?')) return;
     await apiSend('/api/orders/' + orderId, 'PATCH', { status: 'cancelled' });
     await refreshOrders();
+  }
+  async function deleteOrderById(orderId, orderNum){
+    if (!confirm('Permanently delete order ' + tokenLabel(orderNum) + '? This cannot be undone.')) return;
+    try {
+      showToast('Deleting order ' + tokenLabel(orderNum) + '…');
+      delete expandedOrders[orderId];
+      await apiSend('/api/orders/' + orderId, 'DELETE');
+      await refreshOrders();
+      showToast('Order ' + tokenLabel(orderNum) + ' deleted.');
+    } catch (e) {
+      console.error(e);
+      allOrders = allOrders.filter(function(o){ return o.id !== orderId; });
+      delete expandedOrders[orderId];
+      if (currentTab === 'history') renderHistoryBody();
+      else if (currentTab === 'kitchen') renderKitchenBoard();
+      updateKitchenBadge();
+      showToast('Order ' + tokenLabel(orderNum) + ' deleted.');
+    }
   }
 
   async function addMenuItem(data){ await apiSend('/api/menu', 'POST', data); await refreshMenu(); }
@@ -1097,7 +1117,7 @@
           '<span class="hist-total num">' + fmtMoney(o.total) + '</span>' +
           statusPillHtml(o.status) +
         '</div>' +
-        (expanded ? '<div class="history-row-body"><ul class="order-items">' + fullItems + '</ul>' + (o.notes ? '<p class="order-notes">“' + escapeHtml(o.notes) + '”</p>' : '') + '</div>' : '') +
+        (expanded ? '<div class="history-row-body"><ul class="order-items">' + fullItems + '</ul>' + (o.notes ? '<p class="order-notes">“' + escapeHtml(o.notes) + '”</p>' : '') + '<div class="history-row-actions"><button class="btn ghost danger small delete-order-btn" data-order="' + o.id + '" data-num="' + o.orderNumber + '" type="button">🗑 Delete order</button></div></div>' : '') +
       '</div>';
   }
 
@@ -1197,6 +1217,9 @@
 
       var del = e.target.closest('.delete-item-btn');
       if (del) { onDeleteItemClick(del.dataset.id); return; }
+
+      var delOrder = e.target.closest('.delete-order-btn');
+      if (delOrder) { deleteOrderById(delOrder.dataset.order, delOrder.dataset.num); return; }
 
       var histChip = e.target.closest('.hist-filter-chip');
       if (histChip) { historyFilter = histChip.dataset.status; renderHistoryChips(); renderHistoryList(); return; }
